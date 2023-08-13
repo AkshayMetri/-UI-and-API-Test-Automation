@@ -1,1 +1,49 @@
+import com.microsoft.playwright.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class VisualCrossingUITest {
+    private Playwright playwright;
+    private Browser browser;
+    private Page page;
+
+    @BeforeEach
+    public void setUp() {
+        playwright = Playwright.create();
+        browser = playwright.chromium().launch();
+        page = browser.newPage();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        browser.close();
+        playwright.close();
+    }
+
+    @Test
+    public void testWeatherForecastUI() {
+        page.navigate("https://www.visualcrossing.com");
+
+        // Select the "Weather Data" menu
+        page.click("text=Weather Data");
+
+        // Enter your current city and click "Search" button
+        page.fill("input[name='LocationSearch']", "YourCity"); // Replace 'YourCity' with your actual city
+        page.click("text=Search");
+
+        // Verify that weather forecast for your city is shown
+        assertTrue(page.isVisible("css=.weather-details"));
+
+        // You can add more assertions here based on what you want to verify
+        // For example: assert that the temperature, humidity, etc., are displayed
+        assertTrue(page.isVisible("css=.temperature"));
+        assertTrue(page.isVisible("css=.humidity"));
+        // ...
+
+        // You can also verify that the forecast details are not empty or null
+        String forecastText = page.innerText("css=.weather-details");
+        assertNotNull(forecastText);
+        assertNotEquals("", forecastText);
+    }
+}
 
