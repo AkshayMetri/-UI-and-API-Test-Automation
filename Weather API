@@ -1,1 +1,36 @@
+const chai = require('chai');
+const expect = chai.expect;
+const request = require('request');
 
+describe('Weather API Test', function () {
+    const baseUrl = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
+    const city = 'Jamkhandi';  // Replace with your city name
+    const apiKey = 'LTPFRBYJLDQ6TJH4APWGDNCR2';  // Replace with your API key
+
+    it('should return weather data', function (done) {
+        const url = `${baseUrl}${city}?unitGroup=metric&key=${apiKey}&contentType=json`;
+
+        request.get(url, function (error, response, body) {
+            // Check if the API call was successful (HTTP status code 200)
+            expect(response.statusCode).to.equal(200, 'API call failed');
+
+            const data = JSON.parse(body);
+
+            // Check if the response contains the necessary data fields
+            expect(data).to.have.property('days', 'Response does not contain "days"');
+            expect(data).to.have.property('location', 'Response does not contain "location"');
+
+            // Perform additional assertions based on the specific data structure returned by the API
+            if (data.days) {
+                data.days.forEach(function (dayData) {
+                    expect(dayData).to.have.property('datetime', 'Day data does not contain "datetime"');
+                    expect(dayData).to.have.property('tempmax', 'Day data does not contain "tempmax"');
+                    expect(dayData).to.have.property('tempmin', 'Day data does not contain "tempmin"');
+                    // Add more assertions as needed
+                });
+            }
+
+            done();
+        });
+    });
+});
